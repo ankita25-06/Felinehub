@@ -27,10 +27,10 @@ export default function HealthHub({ backendUrl }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Calorie Calculator State
+  // Calorie Calculator State (Number Input)
   const [weight, setWeight] = useState(4);
   const [activity, setActivity] = useState(1.2);
-  const dailyCalories = Math.round(70 * Math.pow(weight, 0.75) * activity);
+  const dailyCalories = Math.round(70 * Math.pow(weight || 0, 0.75) * activity);
 
   // Interactive Checklist State
   const [checklist, setChecklist] = useState([
@@ -110,7 +110,7 @@ export default function HealthHub({ backendUrl }) {
                 }
               }}
               placeholder="Type symptoms here..."
-              rows={8}
+              rows={7}
               style={{ width: '100%', background: 'rgba(147, 161, 243, 0.15)', border: '1px solid #1e293b', padding: '12px', borderRadius: '8px', color: '#fff', marginBottom: '1rem', resize: 'none' }}
             />
             <button type="submit" className="button" disabled={loadingDiagnosis} style={{ width: '100%' }}>
@@ -119,7 +119,7 @@ export default function HealthHub({ backendUrl }) {
           </form>
 
           {/* RIGHT: Pure Image Carousel */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '360px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '320px' }}>
             <img
               src={rotatingImages[currentImageIndex]}
               alt="Cat slide"
@@ -147,34 +147,35 @@ export default function HealthHub({ backendUrl }) {
         )}
       </section>
 
-      {/* BOTTOM SECTION: Matched Box Heights */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginTop: '2rem', alignItems: 'stretch' }}>
+      {/* BOTTOM SECTION: Compact Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginTop: '1.5rem', alignItems: 'stretch' }}>
         
-        {/* Calorie Calculator */}
-        <section className="card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+        {/* Compact Calorie Calculator with Weight Input Box */}
+        <section className="card-panel" style={{ margin: 0, padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
-            <h3><Calculator className="title-icon" /> Daily Feline Feeding & Calorie Calculator</h3>
-            <p className="subtitle">Calculate optimal daily caloric intake based on weight and activity level.</p>
+            <h3 style={{ fontSize: '1.1rem', margin: 0 }}><Calculator className="title-icon" size={18} /> Daily Feline Feeding & Calorie Calculator</h3>
+            <p className="subtitle" style={{ fontSize: '0.85rem', marginTop: '4px' }}>Calculate optimal daily caloric intake based on weight and activity level.</p>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Cat's Weight: {weight} kg</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 500 }}>Weight (kg)</label>
                 <input 
-                  type="range" 
-                  min="1" 
-                  max="10" 
-                  step="0.5" 
+                  type="number" 
+                  min="0.5" 
+                  max="20" 
+                  step="0.1" 
                   value={weight} 
-                  onChange={(e) => setWeight(parseFloat(e.target.value))}
-                  style={{ width: '100%', accentColor: 'var(--accent)' }}
+                  onChange={(e) => setWeight(parseFloat(e.target.value) || '')}
+                  placeholder="e.g. 4.5"
+                  style={{ width: '100%', padding: '8px 12px', background: '#0f172a', color: '#fff', borderRadius: '8px', border: '1px solid #1e293b', fontSize: '0.9rem' }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Activity Level</label>
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 500 }}>Activity Level</label>
                 <select 
                   value={activity} 
                   onChange={(e) => setActivity(parseFloat(e.target.value))}
-                  style={{ width: '100%', padding: '10px', background: '#0f172a', color: '#fff', borderRadius: '8px', border: '1px solid #1e293b' }}
+                  style={{ width: '100%', padding: '8px 10px', background: '#0f172a', color: '#fff', borderRadius: '8px', border: '1px solid #1e293b', fontSize: '0.85rem' }}
                 >
                   <option value={1.0}>Inactive / Senior (1.0x)</option>
                   <option value={1.2}>Normal Adult / Neutered (1.2x)</option>
@@ -185,44 +186,44 @@ export default function HealthHub({ backendUrl }) {
             </div>
           </div>
 
-          <div style={{ marginTop: '1.5rem', padding: '1.2rem', background: 'rgba(56, 189, 248, 0.1)', borderRadius: '10px', border: '1px solid var(--accent)' }}>
-            <h4 style={{ color: 'var(--accent)', margin: 0, fontSize: '1.05rem' }}>Recommended Daily Energy: <strong>{dailyCalories} kcal / day</strong></h4>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: '4px 0 0 0' }}>Split into 2-3 meals daily according to vet recommendations.</p>
+          <div style={{ marginTop: '1rem', padding: '0.85rem 1rem', background: 'rgba(56, 189, 248, 0.1)', borderRadius: '8px', border: '1px solid var(--accent)' }}>
+            <h4 style={{ color: 'var(--accent)', margin: 0, fontSize: '0.95rem' }}>Recommended Daily Energy: <strong>{dailyCalories} kcal / day</strong></h4>
+            <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: '2px 0 0 0' }}>Split into 2-3 meals daily according to vet recommendations.</p>
           </div>
         </section>
 
-        {/* Dynamic Care & Vaccination Tracker */}
-        <section className="card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+        {/* Compact Care & Vaccination Checklist */}
+        <section className="card-panel" style={{ margin: 0, padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
-            <h3><CheckSquare className="title-icon" /> Cat Care & Vaccination Checklist</h3>
-            <p className="subtitle">Track recommended core vaccines or add your custom health reminders.</p>
+            <h3 style={{ fontSize: '1.1rem', margin: 0 }}><CheckSquare className="title-icon" size={18} /> Cat Care & Vaccination Checklist</h3>
+            <p className="subtitle" style={{ fontSize: '0.85rem', marginTop: '4px' }}>Track recommended core vaccines or add your custom health reminders.</p>
 
             {/* Add Custom Task Form */}
-            <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '10px', marginTop: '1.2rem' }}>
+            <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '8px', marginTop: '0.85rem' }}>
               <input
                 type="text"
                 value={newTaskInput}
                 onChange={(e) => setNewTaskInput(e.target.value)}
                 placeholder="Add custom vaccine or care item..."
-                style={{ flex: 1, padding: '10px 14px', background: 'rgba(147, 161, 243, 0.15)', border: '1px solid #1e293b', borderRadius: '8px', color: '#fff' }}
+                style={{ flex: 1, padding: '8px 12px', background: 'rgba(147, 161, 243, 0.15)', border: '1px solid #1e293b', borderRadius: '8px', color: '#fff', fontSize: '0.85rem' }}
               />
               <button 
                 type="submit" 
                 className="button"
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 16px', background: 'var(--accent)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 14px', background: 'var(--accent)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem' }}
               >
-                <Plus size={18} /> Add
+                <Plus size={16} /> Add
               </button>
             </form>
 
-            {/* List with Styled Slim Scrollbar */}
+            {/* Compact List with Styled Slim Scrollbar */}
             <div 
               style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
-                gap: '10px', 
-                marginTop: '1.2rem', 
-                maxHeight: '260px', 
+                gap: '8px', 
+                marginTop: '0.85rem', 
+                maxHeight: '180px', 
                 overflowY: 'auto',
                 scrollbarWidth: 'thin',
                 scrollbarColor: '#334155 transparent'
@@ -235,20 +236,20 @@ export default function HealthHub({ backendUrl }) {
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'space-between',
-                    padding: '12px 16px', 
+                    padding: '8px 12px', 
                     background: 'rgba(255, 255, 255, 0.03)', 
-                    borderRadius: '10px', 
+                    borderRadius: '8px', 
                     border: '1px solid #1e293b',
                     transition: 'all 0.2s ease'
                   }}
                 >
                   <div 
                     onClick={() => toggleCheck(item.id)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', flex: 1 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', flex: 1 }}
                   >
-                    <input type="checkbox" checked={item.done} readOnly style={{ cursor: 'pointer', width: '18px', height: '18px' }} />
+                    <input type="checkbox" checked={item.done} readOnly style={{ cursor: 'pointer', width: '16px', height: '16px' }} />
                     <span style={{ 
-                      fontSize: '0.95rem', 
+                      fontSize: '0.85rem', 
                       textDecoration: item.done ? 'line-through' : 'none',
                       opacity: item.done ? 0.6 : 1 
                     }}>
@@ -258,10 +259,10 @@ export default function HealthHub({ backendUrl }) {
                   
                   <button
                     onClick={() => deleteTask(item.id)}
-                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', opacity: 0.7 }}
+                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px', opacity: 0.7 }}
                     title="Remove item"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={15} />
                   </button>
                 </div>
               ))}
