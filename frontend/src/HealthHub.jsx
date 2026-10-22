@@ -156,7 +156,8 @@ export default function HealthHub({ backendUrl }) {
             <h3 style={{ fontSize: '1.1rem', margin: 0 }}><Calculator className="title-icon" size={18} /> Daily Feline Feeding & Calorie Calculator</h3>
             <p className="subtitle" style={{ fontSize: '0.85rem', marginTop: '4px' }}>Calculate optimal daily caloric intake based on weight and activity level.</p>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+            {/* Added gap: '2rem' for comfortable spacing between inputs */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 500 }}>Weight (kg)</label>
                 <input 
@@ -166,7 +167,7 @@ export default function HealthHub({ backendUrl }) {
                   step="0.1" 
                   value={weight} 
                   onChange={(e) => setWeight(parseFloat(e.target.value) || '')}
-                  placeholder="e.g. 4.5"
+                  placeholder="e.g. 4"
                   style={{ width: '100%', padding: '8px 12px', background: '#0f172a', color: '#fff', borderRadius: '8px', border: '1px solid #1e293b', fontSize: '0.9rem' }}
                 />
               </div>
