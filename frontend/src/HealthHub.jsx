@@ -32,7 +32,7 @@ export default function HealthHub({ backendUrl }) {
   const [activity, setActivity] = useState(1.2);
   const dailyCalories = Math.round(70 * Math.pow(weight, 0.75) * activity);
 
-  // Interactive Checklist State with Core Recommended Vaccines & Custom Adding
+  // Interactive Checklist State
   const [checklist, setChecklist] = useState([
     { id: 1, task: "FVRCP Core Vaccine (Rhinotracheitis / Calicivirus / Panleukopenia)", done: false },
     { id: 2, task: "Rabies Vaccination (Annual / Triennial Booster)", done: true },
@@ -147,39 +147,41 @@ export default function HealthHub({ backendUrl }) {
         )}
       </section>
 
-      {/* BOTTOM SECTION: Calorie Calculator & Interactive Vaccination Checklist */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
+      {/* BOTTOM SECTION: Matched Box Heights */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginTop: '2rem', alignItems: 'stretch' }}>
         
         {/* Calorie Calculator */}
-        <section className="card-panel" style={{ margin: 0 }}>
-          <h3><Calculator className="title-icon" /> Daily Feline Feeding & Calorie Calculator</h3>
-          <p className="subtitle">Calculate optimal daily caloric intake based on weight and activity level.</p>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Cat's Weight: {weight} kg</label>
-              <input 
-                type="range" 
-                min="1" 
-                max="10" 
-                step="0.5" 
-                value={weight} 
-                onChange={(e) => setWeight(parseFloat(e.target.value))}
-                style={{ width: '100%', accentColor: 'var(--accent)' }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Activity Level</label>
-              <select 
-                value={activity} 
-                onChange={(e) => setActivity(parseFloat(e.target.value))}
-                style={{ width: '100%', padding: '10px', background: '#0f172a', color: '#fff', borderRadius: '8px', border: '1px solid #1e293b' }}
-              >
-                <option value={1.0}>Inactive / Senior (1.0x)</option>
-                <option value={1.2}>Normal Adult / Neutered (1.2x)</option>
-                <option value={1.4}>Active / Playful (1.4x)</option>
-                <option value={1.6}>High Energy / Kitten (1.6x)</option>
-              </select>
+        <section className="card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+          <div>
+            <h3><Calculator className="title-icon" /> Daily Feline Feeding & Calorie Calculator</h3>
+            <p className="subtitle">Calculate optimal daily caloric intake based on weight and activity level.</p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Cat's Weight: {weight} kg</label>
+                <input 
+                  type="range" 
+                  min="1" 
+                  max="10" 
+                  step="0.5" 
+                  value={weight} 
+                  onChange={(e) => setWeight(parseFloat(e.target.value))}
+                  style={{ width: '100%', accentColor: 'var(--accent)' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Activity Level</label>
+                <select 
+                  value={activity} 
+                  onChange={(e) => setActivity(parseFloat(e.target.value))}
+                  style={{ width: '100%', padding: '10px', background: '#0f172a', color: '#fff', borderRadius: '8px', border: '1px solid #1e293b' }}
+                >
+                  <option value={1.0}>Inactive / Senior (1.0x)</option>
+                  <option value={1.2}>Normal Adult / Neutered (1.2x)</option>
+                  <option value={1.4}>Active / Playful (1.4x)</option>
+                  <option value={1.6}>High Energy / Kitten (1.6x)</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -190,67 +192,80 @@ export default function HealthHub({ backendUrl }) {
         </section>
 
         {/* Dynamic Care & Vaccination Tracker */}
-        <section className="card-panel" style={{ margin: 0 }}>
-          <h3><CheckSquare className="title-icon" /> Cat Care & Vaccination Checklist</h3>
-          <p className="subtitle">Track recommended core vaccines or add your custom health reminders.</p>
+        <section className="card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+          <div>
+            <h3><CheckSquare className="title-icon" /> Cat Care & Vaccination Checklist</h3>
+            <p className="subtitle">Track recommended core vaccines or add your custom health reminders.</p>
 
-          {/* Add Custom Task / Vaccine Form */}
-          <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '10px', marginTop: '1.2rem' }}>
-            <input
-              type="text"
-              value={newTaskInput}
-              onChange={(e) => setNewTaskInput(e.target.value)}
-              placeholder="Add custom vaccine or care item..."
-              style={{ flex: 1, padding: '10px 14px', background: 'rgba(147, 161, 243, 0.15)', border: '1px solid #1e293b', borderRadius: '8px', color: '#fff' }}
-            />
-            <button 
-              type="submit" 
-              className="button"
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 16px', background: 'var(--accent)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer' }}
-            >
-              <Plus size={18} /> Add
-            </button>
-          </form>
-
-          {/* List of Recommended & Added Items */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '1.2rem', maxHeight: '320px', overflowY: 'auto' }}>
-            {checklist.map((item) => (
-              <div 
-                key={item.id} 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between',
-                  padding: '12px 16px', 
-                  background: 'rgba(255, 255, 255, 0.03)', 
-                  borderRadius: '10px', 
-                  border: '1px solid #1e293b',
-                  transition: 'all 0.2s ease'
-                }}
+            {/* Add Custom Task Form */}
+            <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '10px', marginTop: '1.2rem' }}>
+              <input
+                type="text"
+                value={newTaskInput}
+                onChange={(e) => setNewTaskInput(e.target.value)}
+                placeholder="Add custom vaccine or care item..."
+                style={{ flex: 1, padding: '10px 14px', background: 'rgba(147, 161, 243, 0.15)', border: '1px solid #1e293b', borderRadius: '8px', color: '#fff' }}
+              />
+              <button 
+                type="submit" 
+                className="button"
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 16px', background: 'var(--accent)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer' }}
               >
+                <Plus size={18} /> Add
+              </button>
+            </form>
+
+            {/* List with Styled Slim Scrollbar */}
+            <div 
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '10px', 
+                marginTop: '1.2rem', 
+                maxHeight: '260px', 
+                overflowY: 'auto',
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#334155 transparent'
+              }}
+            >
+              {checklist.map((item) => (
                 <div 
-                  onClick={() => toggleCheck(item.id)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', flex: 1 }}
+                  key={item.id} 
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    padding: '12px 16px', 
+                    background: 'rgba(255, 255, 255, 0.03)', 
+                    borderRadius: '10px', 
+                    border: '1px solid #1e293b',
+                    transition: 'all 0.2s ease'
+                  }}
                 >
-                  <input type="checkbox" checked={item.done} readOnly style={{ cursor: 'pointer', width: '18px', height: '18px' }} />
-                  <span style={{ 
-                    fontSize: '0.95rem', 
-                    textDecoration: item.done ? 'line-through' : 'none',
-                    opacity: item.done ? 0.6 : 1 
-                  }}>
-                    {item.task}
-                  </span>
+                  <div 
+                    onClick={() => toggleCheck(item.id)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', flex: 1 }}
+                  >
+                    <input type="checkbox" checked={item.done} readOnly style={{ cursor: 'pointer', width: '18px', height: '18px' }} />
+                    <span style={{ 
+                      fontSize: '0.95rem', 
+                      textDecoration: item.done ? 'line-through' : 'none',
+                      opacity: item.done ? 0.6 : 1 
+                    }}>
+                      {item.task}
+                    </span>
+                  </div>
+                  
+                  <button
+                    onClick={() => deleteTask(item.id)}
+                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', opacity: 0.7 }}
+                    title="Remove item"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
-                
-                <button
-                  onClick={() => deleteTask(item.id)}
-                  style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', opacity: 0.7 }}
-                  title="Remove item"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
