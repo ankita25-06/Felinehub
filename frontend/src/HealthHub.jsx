@@ -20,11 +20,11 @@ export default function HealthHub({ backendUrl }) {
   // Rotating Image Slider State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Rotate images every 3 seconds (3000ms)
+  // Rotate images every 2 seconds (2000ms)
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % rotatingImages.length);
-    }, 3000);
+    }, 2000);
     return () => clearInterval(timer);
   }, []);
 
@@ -92,7 +92,7 @@ export default function HealthHub({ backendUrl }) {
                 }
               }}
               placeholder="Type symptoms here..."
-              rows={5}
+              rows={8}
               style={{ width: '100%', background: 'rgba(147, 161, 243, 0.15)', border: '1px solid #1e293b', padding: '12px', borderRadius: '8px', color: '#fff', marginBottom: '1rem', resize: 'none' }}
             />
             <button type="submit" className="button" disabled={loadingDiagnosis} style={{ width: '100%' }}>
@@ -100,8 +100,8 @@ export default function HealthHub({ backendUrl }) {
             </button>
           </form>
 
-          {/* RIGHT: Pure Image Carousel (Entire Image Visible, No Dots, Fast 3s Rotation) */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '280px' }}>
+          {/* RIGHT: Pure Image Carousel (Larger Height, 2s Fast Rotation) */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '360px' }}>
             <img
               src={rotatingImages[currentImageIndex]}
               alt="Cat slide"
@@ -110,7 +110,7 @@ export default function HealthHub({ backendUrl }) {
                 height: '100%', 
                 objectFit: 'contain', 
                 borderRadius: '12px',
-                transition: 'opacity 0.4s ease-in-out'
+                transition: 'opacity 0.3s ease-in-out'
               }}
             />
           </div>
@@ -152,7 +152,7 @@ export default function HealthHub({ backendUrl }) {
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Activity Level</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight 500 }}>Activity Level</label>
               <select 
                 value={activity} 
                 onChange={(e) => setActivity(parseFloat(e.target.value))}
