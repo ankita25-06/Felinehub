@@ -20,10 +20,11 @@ export default function HealthHub({ backendUrl }) {
   // Rotating Image Slider State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  // Rotate images every 3 seconds (3000ms)
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % rotatingImages.length);
-    }, 4000);
+    }, 3000);
     return () => clearInterval(timer);
   }, []);
 
@@ -71,7 +72,7 @@ export default function HealthHub({ backendUrl }) {
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '3rem' }}>
       
-      {/* SINGLE COMBINED BOX: AI Health Assistant with Pure Image Slider Aligned Horizontally */}
+      {/* SINGLE COMBINED BOX: AI Health Assistant with Pure Image Slider */}
       <section className="card-panel">
         <h2><ShieldAlert className="title-icon" /> AI Cat Health Assistant</h2>
         <p className="subtitle">Describe your cat's behavior or health changes in plain sentences.</p>
@@ -99,34 +100,19 @@ export default function HealthHub({ backendUrl }) {
             </button>
           </form>
 
-          {/* RIGHT: Pure Image Carousel (No text overlays or headers) */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ position: 'relative', width: '100%', height: '220px', overflow: 'hidden', borderRadius: '12px' }}>
-              <img
-                src={rotatingImages[currentImageIndex]}
-                alt="Cat slide"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
-              />
-            </div>
-
-            {/* Pagination Dots */}
-            <div style={{ display: 'flex', gap: '6px', marginTop: '0.8rem' }}>
-              {rotatingImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  style={{
-                    height: '6px',
-                    borderRadius: '3px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    width: currentImageIndex === index ? '18px' : '6px',
-                    background: currentImageIndex === index ? 'var(--accent)' : '#475569'
-                  }}
-                />
-              ))}
-            </div>
+          {/* RIGHT: Pure Image Carousel (Entire Image Visible, No Dots, Fast 3s Rotation) */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '280px' }}>
+            <img
+              src={rotatingImages[currentImageIndex]}
+              alt="Cat slide"
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'contain', 
+                borderRadius: '12px',
+                transition: 'opacity 0.4s ease-in-out'
+              }}
+            />
           </div>
 
         </div>
