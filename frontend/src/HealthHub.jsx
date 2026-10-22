@@ -152,7 +152,7 @@ export default function HealthHub({ backendUrl }) {
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight 500 }}>Activity Level</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Activity Level</label>
               <select 
                 value={activity} 
                 onChange={(e) => setActivity(parseFloat(e.target.value))}
