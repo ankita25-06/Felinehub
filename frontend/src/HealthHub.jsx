@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Activity, Calculator, CheckSquare, Camera } from 'lucide-react';
+import { ShieldAlert, Activity, Calculator, CheckSquare } from 'lucide-react';
 
-// Using your local images from frontend/public
 const rotatingImages = [
   "/cat-slide (1).jpeg",
   "/cat-slide (2).jpeg",
@@ -18,10 +17,9 @@ export default function HealthHub({ backendUrl }) {
   const [diagnosisResult, setDiagnosisResult] = useState(null);
   const [loadingDiagnosis, setLoadingDiagnosis] = useState(false);
 
-  // Rotating Image Showcase State
+  // Rotating Image Slider State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Automatically cycle through local slide images every 4 seconds
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % rotatingImages.length);
@@ -73,15 +71,16 @@ export default function HealthHub({ backendUrl }) {
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '3rem' }}>
       
-      {/* TOP SECTION: Side-by-Side Grid for Health Assistant & Rotating Gallery */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', alignItems: 'start' }}>
-        
-        {/* 1. AI Health Assistant & Disease Section */}
-        <section className="card-panel" style={{ margin: 0 }}>
-          <h2><ShieldAlert className="title-icon" /> AI Cat Health Assistant</h2>
-          <p className="subtitle">Describe your cat's behavior or health changes in plain sentences.</p>
+      {/* SINGLE COMBINED BOX: AI Health Assistant with Pure Image Slider Aligned Horizontally */}
+      <section className="card-panel">
+        <h2><ShieldAlert className="title-icon" /> AI Cat Health Assistant</h2>
+        <p className="subtitle">Describe your cat's behavior or health changes in plain sentences.</p>
+
+        {/* Horizontal Split Inside the Box */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', alignItems: 'center', marginTop: '1.5rem' }}>
           
-          <form onSubmit={handleDiagnose} className="symptom-form" style={{ marginTop: '1rem' }}>
+          {/* LEFT: Input Form & Submit Button */}
+          <form onSubmit={handleDiagnose} className="symptom-form">
             <textarea
               value={symptomInput}
               onChange={(e) => setSymptomInput(e.target.value)}
@@ -92,7 +91,7 @@ export default function HealthHub({ backendUrl }) {
                 }
               }}
               placeholder="Type symptoms here..."
-              rows={4}
+              rows={5}
               style={{ width: '100%', background: 'rgba(147, 161, 243, 0.15)', border: '1px solid #1e293b', padding: '12px', borderRadius: '8px', color: '#fff', marginBottom: '1rem', resize: 'none' }}
             />
             <button type="submit" className="button" disabled={loadingDiagnosis} style={{ width: '100%' }}>
@@ -100,69 +99,55 @@ export default function HealthHub({ backendUrl }) {
             </button>
           </form>
 
-          {diagnosisResult && (
-            <div className="result-display animate-slide-up" style={{ marginTop: '1.5rem' }}>
-              <h3><Activity size={20} /> Analysis Result:</h3>
-              <p className="prediction-text" style={{ whiteSpace: "pre-line", lineHeight: '1.6' }}>
-                {diagnosisResult.prediction}
-              </p>
-              <span className="confidence-tag">{diagnosisResult.confidence}</span>
-              <p className="disclaimer">*Always consult a certified veterinarian for official medical evaluations.</p>
-            </div>
-          )}
-        </section>
-
-        {/* 2. Dynamic Rotating Image Gallery Showcase */}
-        <section className="card-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-              <Camera className="title-icon" /> Feline Gallery Showcase
-            </h3>
-            <span style={{ fontSize: '0.75rem', background: 'rgba(56, 189, 248, 0.15)', color: 'var(--accent)', padding: '4px 10px', borderRadius: '20px', border: '1px solid var(--accent)' }}>
-              Live Showcase
-            </span>
-          </div>
-          <p className="subtitle">Visual showcase of companion breeds and care aesthetics.</p>
-
-          <div style={{ position: 'relative', width: '100%', height: '260px', overflow: 'hidden', borderRadius: '12px', border: '1px solid #1e293b', marginTop: '1rem' }}>
-            <img
-              src={rotatingImages[currentImageIndex]}
-              alt="Feline slide showcase"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.7s ease' }}
-            />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(15, 23, 42, 0.8), transparent)', padding: '16px' }}>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#fff', fontWeight: 500 }}>
-                Monitoring comfort, health, and breed traits in real-time.
-              </p>
-            </div>
-          </div>
-
-          {/* Carousel Pagination Dots */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '1rem', flexWrap: 'wrap' }}>
-            {rotatingImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                style={{
-                  height: '8px',
-                  borderRadius: '4px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  width: currentImageIndex === index ? '20px' : '8px',
-                  background: currentImageIndex === index ? 'var(--accent)' : '#475569'
-                }}
+          {/* RIGHT: Pure Image Carousel (No text overlays or headers) */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: '100%', height: '220px', overflow: 'hidden', borderRadius: '12px' }}>
+              <img
+                src={rotatingImages[currentImageIndex]}
+                alt="Cat slide"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
               />
-            ))}
-          </div>
-        </section>
+            </div>
 
-      </div>
+            {/* Pagination Dots */}
+            <div style={{ display: 'flex', gap: '6px', marginTop: '0.8rem' }}>
+              {rotatingImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  style={{
+                    height: '6px',
+                    borderRadius: '3px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    width: currentImageIndex === index ? '18px' : '6px',
+                    background: currentImageIndex === index ? 'var(--accent)' : '#475569'
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Diagnosis Output (spans full width under both) */}
+        {diagnosisResult && (
+          <div className="result-display animate-slide-up" style={{ marginTop: '1.5rem' }}>
+            <h3><Activity size={20} /> Analysis Result:</h3>
+            <p className="prediction-text" style={{ whiteSpace: "pre-line", lineHeight: '1.6' }}>
+              {diagnosisResult.prediction}
+            </p>
+            <span className="confidence-tag">{diagnosisResult.confidence}</span>
+            <p className="disclaimer">*Always consult a certified veterinarian for official medical evaluations.</p>
+          </div>
+        )}
+      </section>
 
       {/* BOTTOM SECTION: Calorie Calculator & Checklist */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
         
-        {/* 3. Daily Feline Feeding & Calorie Calculator */}
+        {/* Calorie Calculator */}
         <section className="card-panel" style={{ margin: 0 }}>
           <h3><Calculator className="title-icon" /> Daily Feline Feeding & Calorie Calculator</h3>
           <p className="subtitle">Calculate optimal daily caloric intake based on weight and activity level.</p>
@@ -201,7 +186,7 @@ export default function HealthHub({ backendUrl }) {
           </div>
         </section>
 
-        {/* 4. Cat Care & Vaccination Checklist */}
+        {/* Care & Vaccination Checklist */}
         <section className="card-panel" style={{ margin: 0 }}>
           <h3><CheckSquare className="title-icon" /> Cat Care & Vaccination Checklist</h3>
           <p className="subtitle">Keep track of essential health milestones and routine treatments.</p>
