@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Activity, Calculator, CheckSquare } from 'lucide-react';
+import { ShieldAlert, Activity, Calculator, CheckSquare, Plus, Trash2 } from 'lucide-react';
 
 const rotatingImages = [
   "/cat-slide (1).jpeg",
@@ -20,7 +20,6 @@ export default function HealthHub({ backendUrl }) {
   // Rotating Image Slider State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Rotate images every 2 seconds (2000ms)
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % rotatingImages.length);
@@ -33,16 +32,36 @@ export default function HealthHub({ backendUrl }) {
   const [activity, setActivity] = useState(1.2);
   const dailyCalories = Math.round(70 * Math.pow(weight, 0.75) * activity);
 
-  // Checklist State
+  // Interactive Checklist State with Core Recommended Vaccines & Custom Adding
   const [checklist, setChecklist] = useState([
-    { id: 1, task: "Annual Vet Checkup & Exam", done: false },
-    { id: 2, task: "Flea & Tick Prevention Treatment", done: true },
-    { id: 3, task: "Core Vaccinations (Rabies / FVRCP)", done: false },
-    { id: 4, task: "Dental Hygiene & Teeth Brushing", done: false }
+    { id: 1, task: "FVRCP Core Vaccine (Rhinotracheitis / Calicivirus / Panleukopenia)", done: false },
+    { id: 2, task: "Rabies Vaccination (Annual / Triennial Booster)", done: true },
+    { id: 3, task: "Feline Leukemia Virus (FeLV) Vaccine", done: false },
+    { id: 4, task: "Flea, Tick & Heartworm Prevention Treatment", done: true },
+    { id: 5, task: "Routine Internal Deworming Protocol", done: false },
+    { id: 6, task: "Annual Vet Wellness Checkup & Dental Exam", done: false }
   ]);
+  const [newTaskInput, setNewTaskInput] = useState('');
 
   const toggleCheck = (id) => {
     setChecklist(checklist.map(item => item.id === id ? { ...item, done: !item.done } : item));
+  };
+
+  const handleAddTask = (e) => {
+    e.preventDefault();
+    if (!newTaskInput.trim()) return;
+    
+    const newItem = {
+      id: Date.now(),
+      task: newTaskInput.trim(),
+      done: false
+    };
+    setChecklist([...checklist, newItem]);
+    setNewTaskInput('');
+  };
+
+  const deleteTask = (id) => {
+    setChecklist(checklist.filter(item => item.id !== id));
   };
 
   const handleDiagnose = async (e) => {
@@ -72,15 +91,14 @@ export default function HealthHub({ backendUrl }) {
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '3rem' }}>
       
-      {/* SINGLE COMBINED BOX: AI Health Assistant with Pure Image Slider */}
+      {/* TOP SECTION: AI Health Assistant with Pure Image Slider */}
       <section className="card-panel">
         <h2><ShieldAlert className="title-icon" /> AI Cat Health Assistant</h2>
         <p className="subtitle">Describe your cat's behavior or health changes in plain sentences.</p>
 
-        {/* Horizontal Split Inside the Box */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', alignItems: 'center', marginTop: '1.5rem' }}>
           
-          {/* LEFT: Input Form & Submit Button */}
+          {/* LEFT: Input Form */}
           <form onSubmit={handleDiagnose} className="symptom-form">
             <textarea
               value={symptomInput}
@@ -100,7 +118,7 @@ export default function HealthHub({ backendUrl }) {
             </button>
           </form>
 
-          {/* RIGHT: Pure Image Carousel (Larger Height, 2s Fast Rotation) */}
+          {/* RIGHT: Pure Image Carousel */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '360px' }}>
             <img
               src={rotatingImages[currentImageIndex]}
@@ -117,7 +135,6 @@ export default function HealthHub({ backendUrl }) {
 
         </div>
 
-        {/* Diagnosis Output (spans full width under both) */}
         {diagnosisResult && (
           <div className="result-display animate-slide-up" style={{ marginTop: '1.5rem' }}>
             <h3><Activity size={20} /> Analysis Result:</h3>
@@ -130,7 +147,7 @@ export default function HealthHub({ backendUrl }) {
         )}
       </section>
 
-      {/* BOTTOM SECTION: Calorie Calculator & Checklist */}
+      {/* BOTTOM SECTION: Calorie Calculator & Interactive Vaccination Checklist */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
         
         {/* Calorie Calculator */}
@@ -172,32 +189,66 @@ export default function HealthHub({ backendUrl }) {
           </div>
         </section>
 
-        {/* Care & Vaccination Checklist */}
+        {/* Dynamic Care & Vaccination Tracker */}
         <section className="card-panel" style={{ margin: 0 }}>
           <h3><CheckSquare className="title-icon" /> Cat Care & Vaccination Checklist</h3>
-          <p className="subtitle">Keep track of essential health milestones and routine treatments.</p>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '1.5rem' }}>
+          <p className="subtitle">Track recommended core vaccines or add your custom health reminders.</p>
+
+          {/* Add Custom Task / Vaccine Form */}
+          <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '10px', marginTop: '1.2rem' }}>
+            <input
+              type="text"
+              value={newTaskInput}
+              onChange={(e) => setNewTaskInput(e.target.value)}
+              placeholder="Add custom vaccine or care item..."
+              style={{ flex: 1, padding: '10px 14px', background: 'rgba(147, 161, 243, 0.15)', border: '1px solid #1e293b', borderRadius: '8px', color: '#fff' }}
+            />
+            <button 
+              type="submit" 
+              className="button"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 16px', background: 'var(--accent)', color: '#000', fontWeight: 600, border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              <Plus size={18} /> Add
+            </button>
+          </form>
+
+          {/* List of Recommended & Added Items */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '1.2rem', maxHeight: '320px', overflowY: 'auto' }}>
             {checklist.map((item) => (
               <div 
                 key={item.id} 
-                onClick={() => toggleCheck(item.id)}
                 style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '12px', 
-                  padding: '14px 18px', 
+                  justifyContent: 'space-between',
+                  padding: '12px 16px', 
                   background: 'rgba(255, 255, 255, 0.03)', 
                   borderRadius: '10px', 
                   border: '1px solid #1e293b',
-                  cursor: 'pointer',
-                  textDecoration: item.done ? 'line-through' : 'none',
-                  opacity: item.done ? 0.6 : 1,
                   transition: 'all 0.2s ease'
                 }}
               >
-                <input type="checkbox" checked={item.done} readOnly style={{ cursor: 'pointer', width: '18px', height: '18px' }} />
-                <span style={{ fontSize: '1rem' }}>{item.task}</span>
+                <div 
+                  onClick={() => toggleCheck(item.id)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', flex: 1 }}
+                >
+                  <input type="checkbox" checked={item.done} readOnly style={{ cursor: 'pointer', width: '18px', height: '18px' }} />
+                  <span style={{ 
+                    fontSize: '0.95rem', 
+                    textDecoration: item.done ? 'line-through' : 'none',
+                    opacity: item.done ? 0.6 : 1 
+                  }}>
+                    {item.task}
+                  </span>
+                </div>
+                
+                <button
+                  onClick={() => deleteTask(item.id)}
+                  style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', opacity: 0.7 }}
+                  title="Remove item"
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             ))}
           </div>
