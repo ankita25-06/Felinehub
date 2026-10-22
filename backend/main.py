@@ -58,16 +58,28 @@ def generate_health_advice(prompt: str) -> tuple[str, str]:
     if not groq_client:
         return fallback_diagnosis(), "Local Clinical Rules (Offline Mode)"
 
-    candidate_models = ["llama-3.1-8b-instant", "llama3-8b-8192", "llama3-70b-8192"]
+    # Updated to active, reliable Groq production models
+    candidate_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
     for model_id in candidate_models:
         try:
             chat_completion = groq_client.chat.completions.create(
                 messages=[
-                    {"role": "system", "content": "You are an expert feline assistant and veterinary triage specialist. Provide clear, concise, structured responses."},
+                    {
+                        "role": "system", 
+                        "content": (
+                            "You are an expert feline veterinary triage specialist. "
+                            "Analyze the cat owner's specific symptoms carefully and provide a unique, highly detailed response "
+                            "tailored exclusively to what they described. Format your response cleanly using these exact sections:\n"
+                            "🐾 **Likely Condition:** ...\n\n"
+                            "🔍 **Symptom Insights:** ...\n\n"
+                            "🌿 **Supportive Home Care & Remedies:** ...\n\n"
+                            "🚨 **When to See a Vet:** ..."
+                        )
+                    },
                     {"role": "user", "content": prompt}
                 ],
                 model=model_id,
-                temperature=0.3,
+                temperature=0.4,
             )
             return chat_completion.choices[0].message.content.strip(), f"AI Health Insight ({model_id})"
         except Exception as err:
