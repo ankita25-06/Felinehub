@@ -6,8 +6,8 @@ from pydantic import BaseModel
 import pandas as pd
 from google import genai
 from google.genai import types
-from groq import Groq
 
+# Initialize Gemini Client
 gemini_client = genai.Client() if os.getenv("GEMINI_API_KEY") else None
 
 app = FastAPI()
@@ -19,10 +19,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize Groq Client
-groq_api_key = os.getenv("GROQ_API_KEY")
-groq_client = Groq(api_key=groq_api_key) if groq_api_key else None
 
 # Load breed information for the Breed Explorer
 try:
@@ -55,38 +51,32 @@ class BreedChatInput(BaseModel):
 
 
 def generate_health_advice(prompt: str) -> tuple[str, str]:
-    if not groq_client:
+    if not gemini_client:
         return fallback_diagnosis(), "Local Clinical Rules (Offline Mode)"
 
-    candidate_models = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"]
-    for model_id in candidate_models:
-        try:
-            chat_completion = groq_client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are an expert feline veterinary triage specialist. "
-                            "Analyze the cat owner's specific symptoms carefully and provide a unique, highly detailed response "
-                            "tailored exclusively to what they described. Format your response cleanly using these exact sections:\n"
-                            "🐾 **Likely Condition:** ...\n\n"
-                            "🔍 **Symptom Insights:** ...\n\n"
-                            "🌿 **Supportive Home Care & Remedies:** ...\n\n"
-                            "🚨 **When to See a Vet:** ..."
-                        )
-                    },
-                    {"role": "user", "content": prompt}
-                ],
-                model=model_id,
+    try:
+        response = gemini_client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=(
+                    "You are an expert feline veterinary triage specialist. "
+                    "Analyze the cat owner's specific symptoms carefully and provide a unique, highly detailed response "
+                    "tailored exclusively to what they described. Format your response cleanly using these exact sections:\n"
+                    "🐾 **Likely Condition:** ...\n\n"
+                    "🔍 **Symptom Insights:** ...\n\n"
+                    "🌿 **Supportive Home Care & Remedies:** ...\n\n"
+                    "🚨 **When to See a Vet:** ..."
+                ),
                 temperature=0.4,
             )
-            return chat_completion.choices[0].message.content.strip(), f"AI Health Insight ({model_id})"
-        except Exception as err:
-            print(f"Model {model_id} failed: {err}")
-            continue
+        )
+        if response.text:
+            return response.text.strip(), "AI Health Insight (Gemini Flash)"
+    except Exception as err:
+        print(f"Gemini health advice error: {err}")
 
-    # Graceful fallback so the UI never displays raw API errors to users
-    return fallback_diagnosis(), "Veterinary Triage Protocol (Safe Mode)"
+    return fallback_diagnosis(), "Veterinary Triage Protocol"
 
 
 def fallback_diagnosis() -> str:
@@ -134,9 +124,9 @@ async def identify_breed_image(file: UploadFile = File(...)):
         if not gemini_client:
             return {"analysis": "⚠️ GEMINI_API_KEY is missing in backend environment variables."}
 
-        # Use Gemini Flash for fast, accurate image understanding
+        # Use Gemini 2.5 Flash for fast, accurate image understanding
         response = gemini_client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-2.5-flash',
             contents=[
                 types.Part.from_bytes(
                     data=contents,

@@ -1,7 +1,7 @@
 fastapi
 uvicorn
-pydantic
 pandas
 google-genai
+pydantic
 python-multipart
-groq
+requests
