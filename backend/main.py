@@ -54,27 +54,30 @@ def generate_health_advice(prompt: str) -> tuple[str, str]:
     if not gemini_client:
         return fallback_diagnosis(), "Local Clinical Rules (Offline Mode)"
 
-    try:
-        response = gemini_client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=(
-                    "You are an expert feline veterinary triage specialist. "
-                    "Analyze the cat owner's specific symptoms carefully and provide a unique, highly detailed response "
-                    "tailored exclusively to what they described. Format your response cleanly using these exact sections:\n"
-                    "🐾 **Likely Condition:** ...\n\n"
-                    "🔍 **Symptom Insights:** ...\n\n"
-                    "🌿 **Supportive Home Care & Remedies:** ...\n\n"
-                    "🚨 **When to See a Vet:** ..."
-                ),
-                temperature=0.4,
+    candidate_models = ["gemini-1.5-flash", "gemini-1.5-pro"]
+    for model_id in candidate_models:
+        try:
+            response = gemini_client.models.generate_content(
+                model=model_id,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=(
+                        "You are an expert feline veterinary triage specialist. "
+                        "Analyze the cat owner's specific symptoms carefully and provide a unique, highly detailed response "
+                        "tailored exclusively to what they described. Format your response cleanly using these exact sections:\n"
+                        "🐾 **Likely Condition:** ...\n\n"
+                        "🔍 **Symptom Insights:** ...\n\n"
+                        "🌿 **Supportive Home Care & Remedies:** ...\n\n"
+                        "🚨 **When to See a Vet:** ..."
+                    ),
+                    temperature=0.4,
+                )
             )
-        )
-        if response.text:
-            return response.text.strip(), "AI Health Insight (Gemini Flash)"
-    except Exception as err:
-        print(f"Gemini health advice error: {err}")
+            if response.text:
+                return response.text.strip(), f"AI Health Insight ({model_id})"
+        except Exception as err:
+            print(f"Gemini model {model_id} error: {err}")
+            continue
 
     return fallback_diagnosis(), "Veterinary Triage Protocol"
 
@@ -124,27 +127,36 @@ async def identify_breed_image(file: UploadFile = File(...)):
         if not gemini_client:
             return {"analysis": "⚠️ GEMINI_API_KEY is missing in backend environment variables."}
 
-        # Use Gemini 2.5 Flash for fast, accurate image understanding
-        response = gemini_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=[
-                types.Part.from_bytes(
-                    data=contents,
-                    mime_type=file.content_type or "image/jpeg",
-                ),
-                (
-                    "Analyze this image of a cat in detail and provide a structured breakdown with the following format:\n"
-                    "🐾 **Predicted Breed:** [Specific Breed Name or Mix]\n\n"
-                    "🔍 **Key Physical Features:** [Specific coat color, pattern, eye color, and facial structure visible in this exact image]\n\n"
-                    "🌿 **Care Insight:** [Tailored care, grooming, and health advice for this specific breed type]"
-                ),
-            ],
-        )
+        candidate_models = ["gemini-1.5-flash", "gemini-1.5-pro"]
+        response = None
 
-        if response.text:
+        for model_id in candidate_models:
+            try:
+                response = gemini_client.models.generate_content(
+                    model=model_id,
+                    contents=[
+                        types.Part.from_bytes(
+                            data=contents,
+                            mime_type=file.content_type or "image/jpeg",
+                        ),
+                        (
+                            "Analyze this image of a cat in detail and provide a structured breakdown with the following format:\n"
+                            "🐾 **Predicted Breed:** [Specific Breed Name or Mix]\n\n"
+                            "🔍 **Key Physical Features:** [Specific coat color, pattern, eye color, and facial structure visible in this exact image]\n\n"
+                            "🌿 **Care Insight:** [Tailored care, grooming, and health advice for this specific breed type]"
+                        ),
+                    ],
+                )
+                if response and response.text:
+                    break
+            except Exception as model_err:
+                print(f"Model {model_id} vision error: {model_err}")
+                continue
+
+        if response and response.text:
             return {"analysis": response.text}
         else:
-            return {"analysis": "⚠️ Could not generate an analysis for this image. Please try another photo."}
+            return {"analysis": "⚠️ Could not generate an analysis for this image. Please try another photo or verify API model access."}
 
     except Exception as general_err:
         print(f"Gemini Vision Error: {str(general_err)}")
