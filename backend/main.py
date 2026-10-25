@@ -56,11 +56,10 @@ class BreedChatInput(BaseModel):
 
 def generate_health_advice(prompt: str) -> tuple[str, str]:
     if not groq_client:
-        return "⚠️ GROQ_API_KEY is missing in Render environment variables.", "Configuration Error"
+        return fallback_diagnosis(), "Local Clinical Rules (Offline Mode)"
 
-    candidate_models = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"]
-    last_error = ""
-    
+    # Use the universally accessible free-tier model
+    candidate_models = ["llama-3.1-8b-instant"]
     for model_id in candidate_models:
         try:
             chat_completion = groq_client.chat.completions.create(
@@ -69,8 +68,12 @@ def generate_health_advice(prompt: str) -> tuple[str, str]:
                         "role": "system",
                         "content": (
                             "You are an expert feline veterinary triage specialist. "
-                            "Provide a unique, highly specific response tailored directly to the symptoms described. "
-                            "Format with: \n🐾 **Likely Condition:** ...\n\n🔍 **Symptom Insights:** ...\n\n🌿 **Supportive Home Care & Remedies:** ...\n\n🚨 **When to See a Vet:** ..."
+                            "Analyze the cat owner's specific symptoms carefully and provide a unique, highly detailed response "
+                            "tailored exclusively to what they described. Format your response cleanly using these exact sections:\n"
+                            "🐾 **Likely Condition:** ...\n\n"
+                            "🔍 **Symptom Insights:** ...\n\n"
+                            "🌿 **Supportive Home Care & Remedies:** ...\n\n"
+                            "🚨 **When to See a Vet:** ..."
                         )
                     },
                     {"role": "user", "content": prompt}
@@ -80,11 +83,10 @@ def generate_health_advice(prompt: str) -> tuple[str, str]:
             )
             return chat_completion.choices[0].message.content.strip(), f"AI Health Insight ({model_id})"
         except Exception as err:
-            last_error = str(err)
             print(f"Model {model_id} failed: {err}")
-            continue
+            return f"⚠️ Groq API Error: {str(err)}", "API Error"
 
-    return f"⚠️ Groq API Error: {last_error}", "API Error"
+    return fallback_diagnosis(), "Veterinary Triage Protocol"
 
 
 def fallback_diagnosis() -> str:
