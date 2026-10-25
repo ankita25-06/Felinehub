@@ -58,8 +58,7 @@ def generate_health_advice(prompt: str) -> tuple[str, str]:
     if not groq_client:
         return fallback_diagnosis(), "Local Clinical Rules (Offline Mode)"
 
-    # Use the universally accessible free-tier model
-    candidate_models = ["llama-3.1-8b-instant"]
+    candidate_models = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"]
     for model_id in candidate_models:
         try:
             chat_completion = groq_client.chat.completions.create(
@@ -84,9 +83,10 @@ def generate_health_advice(prompt: str) -> tuple[str, str]:
             return chat_completion.choices[0].message.content.strip(), f"AI Health Insight ({model_id})"
         except Exception as err:
             print(f"Model {model_id} failed: {err}")
-            return f"⚠️ Groq API Error: {str(err)}", "API Error"
+            continue
 
-    return fallback_diagnosis(), "Veterinary Triage Protocol"
+    # Graceful fallback so the UI never displays raw API errors to users
+    return fallback_diagnosis(), "Veterinary Triage Protocol (Safe Mode)"
 
 
 def fallback_diagnosis() -> str:
